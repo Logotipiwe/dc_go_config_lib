@@ -35,11 +35,13 @@ func GetConfigOr(key, defaultVal string) string {
 }
 
 func LoadDcConfig() {
+	csUrl := os.Getenv("CONFIG_SERVER_URL")
 	for i := 0; i < 5; i++ {
 		if i == 4 {
 			log.Fatal("Failed to get config, shutting down")
 		}
-		err := loadDcConfigInternal()
+		println(fmt.Sprintf("Getting config from %s...", csUrl))
+		err := loadDcConfigInternal(csUrl)
 		if err != nil {
 			println(err.Error())
 			time.Sleep(5 * time.Second)
@@ -54,7 +56,7 @@ func LoadDcConfigDynamically(intervalSec int) {
 	go func() {
 		for {
 			time.Sleep(time.Duration(intervalSec) * time.Second)
-			err := loadDcConfigInternal()
+			err := loadDcConfigInternal("")
 			if err != nil {
 				log.Println(err.Error())
 			}
@@ -62,11 +64,8 @@ func LoadDcConfigDynamically(intervalSec int) {
 	}()
 }
 
-func loadDcConfigInternal() error {
-	csUrl := os.Getenv("CONFIG_SERVER_URL")
-	println(fmt.Sprintf("Getting config from %s...", csUrl))
+func loadDcConfigInternal(csUrl string) error {
 	request, err := http.NewRequest("GET", csUrl+"/api/get-config", nil)
-
 	params := url.Values{}
 	params.Add("mToken", GetConfig("M_TOKEN"))
 	params.Add("service", GetConfig("SERVICE_NAME"))
