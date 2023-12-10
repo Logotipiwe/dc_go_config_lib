@@ -49,6 +49,19 @@ func LoadDcConfig() {
 	}
 }
 
+func LoadDcConfigDynamically(intervalSec int) {
+	LoadDcConfig()
+	go func() {
+		for {
+			time.Sleep(time.Duration(intervalSec) * time.Second)
+			err := loadDcConfigInternal()
+			if err != nil {
+				log.Println(err.Error())
+			}
+		}
+	}()
+}
+
 func loadDcConfigInternal() error {
 	csUrl := os.Getenv("CONFIG_SERVER_URL")
 	println(fmt.Sprintf("Getting config from %s...", csUrl))
