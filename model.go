@@ -1,4 +1,4 @@
-package src
+package dc_go_config_lib
 
 type DcPropertyDto struct {
 	Id          string `json:"id"`

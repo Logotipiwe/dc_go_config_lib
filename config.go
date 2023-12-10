@@ -1,4 +1,4 @@
-package src
+package dc_go_config_lib
 
 import (
 	"encoding/json"
@@ -36,9 +36,16 @@ func GetConfigOr(key, defaultVal string) string {
 }
 
 func LoadDcConfig() {
+	err := loadDcConfigWithAttempts()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func loadDcConfigWithAttempts() error {
 	for i := 0; i < 5; i++ {
 		if i == 4 {
-			log.Fatal("Failed to get config, shutting down")
+			return errors.New("Failed to get config, shutting down")
 		}
 		println(fmt.Sprintf("Getting config from %s...", csUrl))
 		err := loadDcConfigInternal(csUrl)
@@ -49,19 +56,24 @@ func LoadDcConfig() {
 		}
 		break
 	}
+	return nil
 }
 
 func LoadDcConfigDynamically(intervalSec int) {
-	LoadDcConfig()
-	go func() {
-		for {
-			time.Sleep(time.Duration(intervalSec) * time.Second)
-			err := loadDcConfigInternal(csUrl)
-			if err != nil {
-				log.Println(err.Error())
+	err := loadDcConfigWithAttempts()
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		go func() {
+			for {
+				time.Sleep(time.Duration(intervalSec) * time.Second)
+				err := loadDcConfigInternal(csUrl)
+				if err != nil {
+					log.Println(err.Error())
+				}
 			}
-		}
-	}()
+		}()
+	}
 }
 
 func loadDcConfigInternal(csUrl string) error {
