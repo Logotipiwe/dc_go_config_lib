@@ -12,27 +12,24 @@ import (
 )
 
 var dcConfig []DcPropertyDto
-var dcConfigMap = make(map[string]string)
+
+// var dcConfigMap = make(map[string]string)
 var csUrl = os.Getenv("CONFIG_SERVER_URL")
 
 func GetConfig(key string) string {
-	s, has := dcConfigMap[key]
-	if has {
-		return s
-	}
+	//s, has := dcConfigMap[key]
+	//if has {
+	//	return s
+	//}
 	return os.Getenv(key)
 }
 
 func GetConfigOr(key, defaultVal string) string {
-	s, has := dcConfigMap[key]
-	if has {
-		return s
+	env, has := os.LookupEnv(key)
+	if !has {
+		return defaultVal
 	}
-	res, has := os.LookupEnv(key)
-	if has {
-		return res
-	}
-	return defaultVal
+	return env
 }
 
 func LoadDcConfig() {
@@ -105,7 +102,11 @@ func loadDcConfigInternal(csUrl string) error {
 	}
 	dcConfig = answer
 	for _, dto := range dcConfig {
-		dcConfigMap[dto.Name] = dto.Value
+		//dcConfigMap[dto.Name] = dto.Value
+		err := os.Setenv(dto.Name, dto.Value)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
