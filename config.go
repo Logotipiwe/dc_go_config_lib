@@ -37,6 +37,15 @@ func GetConfigInt(key string) (int, error) {
 	return res, err
 }
 
+func GetConfigIntOr(key string, defaultVal int) int {
+	val := GetConfig(key)
+	res, err := strconv.Atoi(val)
+	if err != nil {
+		return defaultVal
+	}
+	return res
+}
+
 func LoadDcConfig() {
 	err := internal.LoadDcConfigWithAttempts()
 	if err != nil {
