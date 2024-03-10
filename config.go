@@ -46,6 +46,19 @@ func GetConfigIntOr(key string, defaultVal int) int {
 	return res
 }
 
+func GetConfigFloat64(key string) (float64, error) {
+	val := GetConfig(key)
+	return strconv.ParseFloat(val, 64)
+}
+
+func GetConfigFloat64Or(key string, defaultVal float64) float64 {
+	res, err := strconv.ParseFloat(GetConfig(key), 64)
+	if err != nil {
+		return defaultVal
+	}
+	return res
+}
+
 func LoadDcConfig() {
 	err := internal.LoadDcConfigWithAttempts()
 	if err != nil {
