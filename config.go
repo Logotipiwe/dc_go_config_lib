@@ -28,6 +28,15 @@ func GetConfigBool(key string) (bool, error) {
 	return res, err
 }
 
+func GetConfigBoolOr(key string, defaultVal bool) bool {
+	val := GetConfig(key)
+	res, err := strconv.ParseBool(val)
+	if err != nil {
+		return defaultVal
+	}
+	return res
+}
+
 func GetConfigInt(key string) (int, error) {
 	val := GetConfig(key)
 	res, err := strconv.Atoi(val)
