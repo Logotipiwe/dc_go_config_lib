@@ -15,12 +15,14 @@ var configGot = false
 func LoadDcConfigWithAttempts() error {
 	for i := 0; i < 5; i++ {
 		if i == 4 {
-			return errors.New("failed to get config, shutting down")
+			// return errors.New("failed to get config, shutting down")
+			// ignore config server if absent
+			return nil
 		}
 		err := LoadDcConfigInternal()
 		if err != nil {
 			println(err.Error())
-			time.Sleep(5 * time.Second)
+			time.Sleep(1 * time.Second)
 			continue
 		}
 		break
